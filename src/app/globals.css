@@ -17,11 +17,11 @@
 }
 
 body {
-font-family: 'Monserrat', sans-serif;
+  font-family: 'Monserrat', sans-serif;
 }
 
 .button {
-  @apply bg-white text-[#ff000] rounded-md px-4 py-2 font-bold transition duration-300 ease-in-out;
+  @apply bg-white text-[#ff0000] rounded-md px-4 py-2 font-bold transition duration-300 ease-in-out;
 }
 
 .button:hover {

@@ -21,6 +21,18 @@ const Stock = () => {
         });
     };
 
+    const handlePriceChange = (index: number, newPrice: any) => {
+        setChangesMade(true);
+        setStockData(prevStockData => {
+            const newStockData = [...prevStockData];
+            newStockData[index] = {
+                ...newStockData[index],
+                price: newPrice,
+            };
+            return newStockData;
+        });
+    };
+
     const handleDiscountChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
         setChangesMade(true);
         const newDiscount = event.target.value;
@@ -32,10 +44,6 @@ const Stock = () => {
             };
             return newStockData;
         });
-    };
-
-    const handleEditQuantity = (index: number) => {
-        console.log(index);
     };
 
     const handleSaveChanges = () => {
@@ -62,16 +70,27 @@ const Stock = () => {
                         <tr key={product.id} className='border-b border-gray-200'>
                             <td className='py-2'>{product.id}</td>
                             <td className='py-2'>{product.name}</td>
-                            <td className='py-2' onClick={() => handleEditQuantity(index)}>
-                                <span>{product.quantity}</span>
+                            <td className='py-2'>
+                                <input
+                                    type='number'
+                                    value={product.quantity}
+                                    onChange={(e) => handleQuantityChange(index, e.target.value)}
+                                />
                             </td>
-                            <td className='py-2'>{product.price}</td>
+                            <td className='py-2'>
+                                ${' '}
+                                <input
+                                    type='number'
+                                    value={product.price}
+                                    onChange={(e) => handlePriceChange(index, e.target.value)}
+                                />
+                            </td>
                             <td className='py-2'>
                                 <input
                                     type='text'
                                     className='w-full p-1 border border-gray-300 rounded'
                                     value={product.discount}
-                                    onChange={event => handleDiscountChange(index, event)}
+                                    onChange={(e) => handleDiscountChange(index, e)}
                                 />
                             </td>
                         </tr>

@@ -30,7 +30,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan }) => {
                             console.error('Error al inicializar Quagga:', err);
                             return;
                         }
-                        setQuaggaReady(true); // Marcar Quagga como listo
+                        setQuaggaReady(true);
                     });
                 }
             } catch (err) {
@@ -63,13 +63,15 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan }) => {
     }, [onScan, quaggaReady]);
 
     const handleScanToggle = () => {
-        if (quaggaReady) {
+        if (Quagga) {
             if (isScanning) {
                 Quagga.stop();
             } else {
                 Quagga.start();
             }
             setIsScanning(!isScanning);
+        } else {
+            console.error('Quagga is not defined.');
         }
     };
 

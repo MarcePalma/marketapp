@@ -19,4 +19,5 @@ model Product {
   quantity  Int
   price     Float
   discount  String
+  codebar String
 }

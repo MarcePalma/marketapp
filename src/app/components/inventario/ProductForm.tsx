@@ -1,63 +1,87 @@
-"use client"
-
-import { FormEvent, useState } from "react";
+import React, { FormEvent, useState } from "react";
 
 interface Product {
     name: string;
     quantity: number;
     price: number;
+    scanner: string;
 }
 
 interface ProductFormProps {
-    onAddProduct: (product: Product) => void;
+    // Eliminamos onAddProduct
+    scanner: string | null;
 }
 
-const ProductForm: React.FC<ProductFormProps> = ({ onAddProduct }) => {
+const ProductForm: React.FC<ProductFormProps> = ({ scanner }) => {
     const [name, setName] = useState<string>('');
     const [quantity, setQuantity] = useState<string>('');
     const [price, setPrice] = useState<string>('');
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!name || !quantity || !price) {
-            alert('Por favor completa todos los campos');
-            return;
+
+        try {
+            const response = await fetch('/api/stock/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name,
+                    quantity,
+                    price,
+                    codebar: scanner || '',
+                }),
+
+            });
+            if (response.ok) {
+                console.log('Producto agregado correctamente.');
+                setName('');
+                setQuantity('');
+                setPrice('');
+            } else {
+                console.error('Error al agregar el producto:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error en la solicitud fetch:', error);
         }
-        const quantityNumber: number = parseInt(quantity);
-        const priceNumber: number = parseFloat(price);
-        if (isNaN(quantityNumber) || isNaN(priceNumber)) {
-            alert('Cantidad y precio deben ser números válidos');
-            return;
-        }
-        onAddProduct({ name, quantity: quantityNumber, price: priceNumber });
-        setName('');
-        setQuantity('');
-        setPrice('');
     };
 
     return (
         <div className="max-w-lg mx-auto">
             <h2 className="text-2xl font-semibold mb-4">Agregar Producto</h2>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                <label htmlFor="name">Nombre del Producto</label>
                 <input
                     type="text"
-                    placeholder="Nombre del producto"
+                    name="name"
+                    placeholder="Ingrese el nombre del producto"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
                     className="border border-gray-300 rounded-md p-2"
                 />
+                <label htmlFor="quantity">Cantidad</label>
                 <input
                     type="number"
-                    placeholder="Cantidad"
+                    id="quantity"
+                    placeholder="Ingrese la cantidad"
                     value={quantity}
-                    onChange={(e) => setQuantity(e.target.value)}
                     className="border border-gray-300 rounded-md p-2"
                 />
+                <label htmlFor="price">Precio</label>
                 <input
                     type="number"
-                    placeholder="Precio"
+                    id="price"
+                    placeholder="Ingrese el precio"
                     value={price}
-                    onChange={(e) => setPrice(e.target.value)}
+                    className="border border-gray-300 rounded-md p-2"
+                />
+                <label htmlFor="scanner">Código Escaneado</label>
+                <input
+                    type="text"
+                    id="scanner"
+                    placeholder="Código escaneado"
+                    value={scanner || ''}
+                    readOnly
                     className="border border-gray-300 rounded-md p-2"
                 />
                 <button type="submit" className="bg-blue-500 text-white py-2 rounded-md">

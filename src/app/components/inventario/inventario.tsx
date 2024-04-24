@@ -1,4 +1,3 @@
-"use client"
 import React, { useState } from 'react';
 import BarcodeScanner from '../barcodescanner/barcodescanner';
 import ProductForm from './ProductForm';
@@ -10,13 +9,10 @@ const Inventory: React.FC = () => {
     setScannedCode(code);
   };
 
-  const handleAddProduct = (product: { name: string; quantity: number; price: number }) => {
-    console.log('Producto agregado:', product);
-    setScannedCode(null);
-  };
+
 
   return (
-    <div>
+    <div className='p-40'>
       <h1 className="text-2xl font-bold mb-4">Inventario</h1>
       <div className="flex gap-4">
         <div>
@@ -28,7 +24,7 @@ const Inventory: React.FC = () => {
         </div>
         <div>
           <h2 className="text-xl font-semibold mb-2">Agregar Producto</h2>
-          <ProductForm onAddProduct={handleAddProduct} />
+          <ProductForm scanner={scannedCode} />
         </div>
       </div>
     </div>

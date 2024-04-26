@@ -23,7 +23,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ scanner }) => {
             quantity,
             price,
             codebar,
-            discount:""
+            discount: ""
         };
 
         try {
@@ -50,8 +50,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ scanner }) => {
     };
 
     return (
-        <div className="max-w-lg mx-auto">
-            <h2 className="text-2xl font-semibold mb-4">Agregar Producto</h2>
+        <div className="max-w-lg mx-auto flex justify-center items-center">
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                 <label htmlFor="name">Nombre del Producto</label>
                 <input

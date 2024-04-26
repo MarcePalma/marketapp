@@ -1,24 +1,30 @@
-import React, { FormEvent, useState } from "react";
-
-interface Product {
-    name: string;
-    quantity: number;
-    price: number;
-    scanner: string;
-}
+import React, { FormEvent, useRef } from "react";
 
 interface ProductFormProps {
-    // Eliminamos onAddProduct
     scanner: string | null;
 }
 
 const ProductForm: React.FC<ProductFormProps> = ({ scanner }) => {
-    const [name, setName] = useState<string>('');
-    const [quantity, setQuantity] = useState<string>('');
-    const [price, setPrice] = useState<string>('');
+    const nameRef = useRef<HTMLInputElement>(null);
+    const quantityRef = useRef<HTMLInputElement>(null);
+    const priceRef = useRef<HTMLInputElement>(null);
+    const codebarRef = useRef<HTMLInputElement>(null);
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        const name = nameRef.current?.value || '';
+        const quantity = parseInt(quantityRef.current?.value || '0'); // Convertir a número
+        const price = parseFloat(priceRef.current?.value || '0'); // Convertir a número
+        const codebar = codebarRef.current?.value || '';
+
+        const dataToSend = {
+            name,
+            quantity,
+            price,
+            codebar,
+            discount:""
+        };
 
         try {
             const response = await fetch('/api/stock/create', {
@@ -26,19 +32,15 @@ const ProductForm: React.FC<ProductFormProps> = ({ scanner }) => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    name,
-                    quantity,
-                    price,
-                    codebar: scanner || '',
-                }),
-
+                body: JSON.stringify(dataToSend),
             });
+
             if (response.ok) {
                 console.log('Producto agregado correctamente.');
-                setName('');
-                setQuantity('');
-                setPrice('');
+                nameRef.current!.value = '';
+                quantityRef.current!.value = '';
+                priceRef.current!.value = '';
+                codebarRef.current!.value = '';
             } else {
                 console.error('Error al agregar el producto:', response.statusText);
             }
@@ -54,34 +56,34 @@ const ProductForm: React.FC<ProductFormProps> = ({ scanner }) => {
                 <label htmlFor="name">Nombre del Producto</label>
                 <input
                     type="text"
-                    name="name"
+                    id="name"
+                    ref={nameRef}
                     placeholder="Ingrese el nombre del producto"
-                    value={name}
                     className="border border-gray-300 rounded-md p-2"
                 />
                 <label htmlFor="quantity">Cantidad</label>
                 <input
                     type="number"
                     id="quantity"
+                    ref={quantityRef}
                     placeholder="Ingrese la cantidad"
-                    value={quantity}
                     className="border border-gray-300 rounded-md p-2"
                 />
                 <label htmlFor="price">Precio</label>
                 <input
                     type="number"
                     id="price"
+                    ref={priceRef}
                     placeholder="Ingrese el precio"
-                    value={price}
                     className="border border-gray-300 rounded-md p-2"
                 />
                 <label htmlFor="scanner">Código Escaneado</label>
                 <input
                     type="text"
                     id="scanner"
-                    placeholder="Código escaneado"
-                    value={scanner || ''}
                     readOnly
+                    defaultValue={scanner || ''}
+                    ref={codebarRef}
                     className="border border-gray-300 rounded-md p-2"
                 />
                 <button type="submit" className="bg-blue-500 text-white py-2 rounded-md">

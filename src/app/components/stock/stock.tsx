@@ -1,33 +1,53 @@
-"use client"
-import React, { useState } from 'react';
+'use client'
+import React, { useState, useEffect } from 'react';
 
-const Stock = () => {
-    const [stockData, setStockData] = useState([
-        { id: 1, name: 'Producto 1', quantity: 10, price: 20, discount: '0' },
-        { id: 2, name: 'Producto 2', quantity: 15, price: 30, discount: '0' },
-    ]);
+interface Product {
+    id: number;
+    name: string;
+    quantity: number;
+    price: number;
+    discount: string;
+}
 
+const Stock: React.FC = () => {
+    const [stockData, setStockData] = useState<Product[]>([]);
     const [changesMade, setChangesMade] = useState(false);
 
-    const handleQuantityChange = (index: number, newQuantity: any) => {
+    useEffect(() => {
+        fetch('/api/stock')
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Error al obtener el stock');
+            })
+            .then((data: Product[]) => {
+                setStockData(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }, []);
+
+    const handleQuantityChange = (index: number, newQuantity: string) => {
         setChangesMade(true);
         setStockData(prevStockData => {
             const newStockData = [...prevStockData];
             newStockData[index] = {
                 ...newStockData[index],
-                quantity: newQuantity,
+                quantity: parseInt(newQuantity),
             };
             return newStockData;
         });
     };
 
-    const handlePriceChange = (index: number, newPrice: any) => {
+    const handlePriceChange = (index: number, newPrice: string) => {
         setChangesMade(true);
         setStockData(prevStockData => {
             const newStockData = [...prevStockData];
             newStockData[index] = {
                 ...newStockData[index],
-                price: newPrice,
+                price: parseFloat(newPrice),
             };
             return newStockData;
         });
@@ -47,7 +67,6 @@ const Stock = () => {
     };
 
     const handleSaveChanges = () => {
-        // Aquí podrías agregar la lógica para guardar los cambios en la base de datos
         console.log('Guardando cambios...');
         setChangesMade(false);
     };

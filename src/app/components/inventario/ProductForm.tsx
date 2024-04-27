@@ -51,7 +51,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ scanner }) => {
 
     return (
         <div className="max-w-lg mx-auto flex justify-center items-center">
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4 form">
                 <label htmlFor="name">Nombre del Producto</label>
                 <input
                     type="text"
@@ -89,6 +89,24 @@ const ProductForm: React.FC<ProductFormProps> = ({ scanner }) => {
                     Agregar Producto
                 </button>
             </form>
+            <style>
+           {`
+           .form{
+            border-color: red;
+           }
+           .form label {
+            color: red;
+           }
+           .form input {
+            border-color: red;
+            color: red;
+           }
+           .form button {
+            background-color: red;
+            border-color: red;
+           }
+           `}
+            </style>
         </div>
     );
 };

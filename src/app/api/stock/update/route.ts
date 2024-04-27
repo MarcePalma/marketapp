@@ -2,39 +2,33 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-interface UpdateProductRequest {
-    id: number;
-    name?: string;
-    quantity?: number;
-    price?: number;
-    discount?: string;
-}
 
 export async function PUT(req: Request) {
     if (req.method === 'PUT') {
         try {
-            const requestBody = await req.text();
+            const updatedProducts = await req.json();
 
-            const requestData = JSON.parse(requestBody) as UpdateProductRequest;
+            for (const updatedProduct of updatedProducts) {
+                const existingProduct = await prisma.product.findUnique({
+                    where: { id: updatedProduct.id }
+                });
 
-            const { id, ...updatedProduct } = requestData;
+                if (!existingProduct) {
+                    return new Response(JSON.stringify({ msg: "Producto no encontrado" }), {
+                        status: 404
+                    });
+                }
 
-            const existingProduct = await prisma.product.findUnique({
-                where: { id: Number(id) }
-            });
+                // Eliminar el campo `id` del objeto `updatedProduct`
+                const { id, originalQuantity, originalPrice, originalDiscount, ...updateData } = updatedProduct;
 
-            if (!existingProduct) {
-                return new Response(JSON.stringify({ msg: "Producto no encontrado" }), {
-                    status: 404
+                await prisma.product.update({
+                    where: { id: updatedProduct.id },
+                    data: updateData
                 });
             }
 
-            const updatedProductData = await prisma.product.update({
-                where: { id: Number(id) },
-                data: updatedProduct
-            });
-
-            return new Response(JSON.stringify({ updatedProduct: updatedProductData }), { status: 200 });
+            return new Response(JSON.stringify({ msg: "Productos actualizados correctamente" }), { status: 200 });
         } catch (error) {
             console.error("Error al actualizar producto:", error);
             return new Response(JSON.stringify({ msg: "Error al actualizar producto" }), {

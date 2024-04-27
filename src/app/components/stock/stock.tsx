@@ -1,5 +1,7 @@
-'use client'
+"use client"
+
 import React, { useState, useEffect } from 'react';
+import { PrismaClient } from '@prisma/client';
 
 interface Product {
     id: number;
@@ -7,11 +9,16 @@ interface Product {
     quantity: number;
     price: number;
     discount: string;
+    originalQuantity: number;
+    originalPrice: number; 
+    originalDiscount: string; 
+    changed?: boolean;
 }
 
 const Stock: React.FC = () => {
     const [stockData, setStockData] = useState<Product[]>([]);
     const [changesMade, setChangesMade] = useState(false);
+    const prisma = new PrismaClient();
 
     useEffect(() => {
         fetch('/api/stock')
@@ -22,7 +29,14 @@ const Stock: React.FC = () => {
                 throw new Error('Error al obtener el stock');
             })
             .then((data: Product[]) => {
-                setStockData(data);
+                // Almacenar los datos originales de los productos
+                const stockDataWithOriginalValues = data.map(product => ({
+                    ...product,
+                    originalQuantity: product.quantity,
+                    originalPrice: product.price,
+                    originalDiscount: product.discount,
+                }));
+                setStockData(stockDataWithOriginalValues);
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -36,11 +50,12 @@ const Stock: React.FC = () => {
             newStockData[index] = {
                 ...newStockData[index],
                 quantity: parseInt(newQuantity),
+                changed: true, // Set changed to true when quantity changes
             };
             return newStockData;
         });
     };
-
+    
     const handlePriceChange = (index: number, newPrice: string) => {
         setChangesMade(true);
         setStockData(prevStockData => {
@@ -48,11 +63,12 @@ const Stock: React.FC = () => {
             newStockData[index] = {
                 ...newStockData[index],
                 price: parseFloat(newPrice),
+                changed: true, // Set changed to true when price changes
             };
             return newStockData;
         });
     };
-
+    
     const handleDiscountChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
         setChangesMade(true);
         const newDiscount = event.target.value;
@@ -61,16 +77,54 @@ const Stock: React.FC = () => {
             newStockData[index] = {
                 ...newStockData[index],
                 discount: newDiscount,
+                changed: true, // Set changed to true when discount changes
             };
             return newStockData;
         });
     };
 
-    const handleSaveChanges = () => {
-        console.log('Guardando cambios...');
-        setChangesMade(false);
-    };
+    const handleSaveChanges = async () => {
+        try {
+            console.log('Guardando cambios...');
 
+            // Crear un array para almacenar los productos actualizados
+            const updatedProducts: Product[] = [];
+
+            // Recorrer el array de stockData para encontrar los productos actualizados
+            stockData.forEach(product => {
+                if (product.changed) {
+                    const updatedProduct: Product = {
+                        id: product.id, // Asegúrate de incluir el id del producto
+                        name: product.name,
+                        quantity: product.quantity,
+                        price: product.price,
+                        discount: product.discount,
+                        originalQuantity: product.originalQuantity,
+                        originalPrice: product.originalPrice,
+                        originalDiscount: product.originalDiscount
+                    };
+                    updatedProducts.push(updatedProduct);
+                }
+            });
+
+            const response = await fetch('/api/stock/update', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedProducts), // Enviar solo la información de los productos actualizados
+            });
+
+            if (response.ok) {
+                console.log('Cambios guardados correctamente.');
+                setChangesMade(false);
+            } else {
+                console.error('Error al guardar los cambios:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error en la solicitud fetch:', error);
+        }
+    };
     return (
         <div className='p-40'>
             <h1 className='text-2xl font-bold mb-4'>Stock</h1>

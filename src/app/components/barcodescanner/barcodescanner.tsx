@@ -78,7 +78,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan }) => {
     return (
         <div>
             <video ref={videoRef} autoPlay muted playsInline />
-            <button onClick={handleScanToggle}>
+            <button onClick={handleScanToggle} className='text-white font-semibold bg-red-400 rounded-md'>
                 {isScanning ? 'Detener Escaneo' : 'Iniciar Escaneo'}
             </button>
         </div>

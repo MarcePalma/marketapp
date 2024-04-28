@@ -8,10 +8,11 @@ interface Product {
     name: string;
     quantity: number;
     price: number;
+    codebar: number; // Agregado el campo de código de barras
     discount: string;
     originalQuantity: number;
-    originalPrice: number; 
-    originalDiscount: string; 
+    originalPrice: number;
+    originalDiscount: string;
     changed?: boolean;
 }
 
@@ -99,6 +100,7 @@ const Stock: React.FC = () => {
                         quantity: product.quantity,
                         price: product.price,
                         discount: product.discount,
+                        codebar: product.codebar, // Agregado el código de barras
                         originalQuantity: product.originalQuantity,
                         originalPrice: product.originalPrice,
                         originalDiscount: product.originalDiscount
@@ -131,11 +133,12 @@ const Stock: React.FC = () => {
             <table className='w-full'>
                 <thead>
                     <tr className='bg-gray-200'>
-                        <th className='py-2 text-left w-1/5'>ID</th>
-                        <th className='py-2 text-left w-1/5'>Nombre</th>
-                        <th className='py-2 text-left w-1/5'>Cantidad</th>
-                        <th className='py-2 text-left w-1/5'>Precio</th>
-                        <th className='py-2 text-left w-1/5'>Descuento (%)</th>
+                        <th className='py-2 text-left w-1/6'>ID</th>
+                        <th className='py-2 text-left w-1/6'>Nombre</th>
+                        <th className='py-2 text-left w-1/6'>Cantidad</th>
+                        <th className='py-2 text-left w-1/6'>Precio</th>
+                        <th className='py-2 text-left w-1/6'>Descuento (%)</th>
+                        <th className='py-2 text-left w-1/6'>Código de Barras</th> {/* Columna para código de barras */}
                     </tr>
                 </thead>
                 <tbody>
@@ -166,6 +169,7 @@ const Stock: React.FC = () => {
                                     onChange={(e) => handleDiscountChange(index, e)}
                                 />
                             </td>
+                            <td className='py-2'>{product.codebar}</td> {/* Mostrar el código de barras */}
                         </tr>
                     ))}
                 </tbody>

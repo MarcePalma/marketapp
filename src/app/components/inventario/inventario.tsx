@@ -24,7 +24,7 @@ const Inventory: React.FC = () => {
         </div>
 
         <div>
-          <h2 className="text-xl font-semibold mb-2 px-4 text-red-400">Agregar Producto</h2>
+          <h2 className="text-3xl font-bold mb-2 px-4 text-red-400">Agregar Producto</h2>
           <ProductForm scanner={scannedCode} />
         </div>
       </div>

@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import Quagga from 'quagga';
 
+
 interface BarcodeScannerProps {
     onScan: (code: string) => void;
 }
@@ -8,7 +9,7 @@ interface BarcodeScannerProps {
 const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const [isScanning, setIsScanning] = useState<boolean>(false);
-    const [quaggaReady, setQuaggaReady] = useState<boolean>(false);
+    const [lastScanTime, setLastScanTime] = useState<number>(0);
 
     useEffect(() => {
         const startScanner = async () => {
@@ -30,7 +31,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan }) => {
                             console.error('Error al inicializar Quagga:', err);
                             return;
                         }
-                        setQuaggaReady(true);
+                        Quagga.start();
                     });
                 }
             } catch (err) {
@@ -39,6 +40,8 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan }) => {
         };
 
         startScanner();
+
+        Quagga.onDetected(handleScan);
 
         return () => {
             try {
@@ -52,15 +55,15 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan }) => {
         };
     }, []);
 
-    useEffect(() => {
-        if (quaggaReady) {
-            Quagga.onDetected((data: QuaggaJSResultObject) => {
-                if (data && data.codeResult && data.codeResult.code) {
-                    onScan(data.codeResult.code);
-                }
-            });
+    const handleScan = (data: QuaggaJSResultObject) => {
+        if (data && data.codeResult && data.codeResult.code) {
+            const currentTime = Date.now();
+            if (currentTime - lastScanTime > 1000) {
+                onScan(data.codeResult.code);
+                setLastScanTime(currentTime);
+            }
         }
-    }, [onScan, quaggaReady]);
+    };
 
     const handleScanToggle = () => {
         if (Quagga) {

@@ -12,6 +12,10 @@ export default function Navbar() {
 
   const navLinks = [
     {
+      title: `Inventario`,
+      path: '/',
+    },
+    {
       title: `Stock`,
       path: '/stock',
     },
@@ -20,16 +24,8 @@ export default function Navbar() {
       path: '/ventas',
     },
     {
-      title: `Gastos`,
-      path: '/gastos',
-    },
-    {
       title: `Informes`,
       path: '/turnos',
-    },
-    {
-      title: `Ingresos`,
-      path: '/ingresos',
     },
   ];
 

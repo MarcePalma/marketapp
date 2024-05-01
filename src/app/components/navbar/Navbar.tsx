@@ -25,7 +25,7 @@ export default function Navbar() {
     },
     {
       title: `Informes`,
-      path: '/turnos',
+      path: '/informes',
     },
   ];
 

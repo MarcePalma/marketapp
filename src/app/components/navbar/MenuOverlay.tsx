@@ -7,9 +7,9 @@ import Image from 'next/image';
 
 
 const links = [
+  { path: '/inventario', title: 'Inventario' },
   { path: '/stock', title: 'Stock' },
-  { path: '/gastos', title: 'Gastos' },
-  { path: '/ingresos', title: 'Ingresos' },
+  { path: '/ventas', title: 'Ventas' },
   { path: '/informes', title: 'Informes' },
 ];
 

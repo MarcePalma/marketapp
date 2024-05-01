@@ -25,3 +25,16 @@ body {
 .button:hover {
   @apply bg-[#ff0000] text-white;
 }
+
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #ff0000;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #f0f0f0;
+}

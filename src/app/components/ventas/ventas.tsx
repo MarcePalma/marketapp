@@ -35,11 +35,14 @@ const Sales: React.FC = () => {
     // Función para manejar el escaneo de códigos de barras
     const handleScan = (code: string) => {
         setScannedCode(code);
-        const scannedProduct = stockData.find(product => product.codebar === parseInt(code));
+        const scannedProduct = filteredStockData.find(product => product.codebar === parseInt(code));
         if (scannedProduct) {
             setScannedProducts(prevProducts => [...prevProducts, scannedProduct]);
         }
     };
+
+
+
 
     // Calcular el precio total
     const totalPrice = scannedProducts.reduce((total, product) => {
@@ -73,7 +76,6 @@ const Sales: React.FC = () => {
                             <tr className="bg-gray-200">
                                 <th className="p-2 text-left">ID</th>
                                 <th className="p-2 text-left">Nombre</th>
-                                <th className="p-2 text-left">Cantidad</th>
                                 <th className="p-2 text-left">Precio</th>
                             </tr>
                         </thead>
@@ -82,7 +84,6 @@ const Sales: React.FC = () => {
                                 <tr key={product.id} className="border-b border-gray-200">
                                     <td className="py-2">{product.id}</td>
                                     <td className="py-2">{product.name}</td>
-                                    <td className="py-2">{product.quantity}</td>
                                     <td className="py-2">${product.price}</td>
                                 </tr>
                             ))}
@@ -113,17 +114,16 @@ const Sales: React.FC = () => {
                     <div className="mt-4">
                         <h2 className="text-lg font-semibold">Total</h2>
                         <p className="text-xl font-bold">${totalPrice.toFixed(2)}</p>
+                        {!isSaleCompleted && scannedCode && (
+                            <div className="flex justify-right mt-4">
+                                <button className="bg-green-500 text-white px-4 py-2 rounded-md" onClick={handleSaleCompleted}>
+                                    Venta Completada
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
-
-            {!isSaleCompleted && scannedCode && (
-                <div className="flex justify-center mt-4">
-                    <button className="bg-green-500 text-white px-4 py-2 rounded-md" onClick={handleSaleCompleted}>
-                        Venta Completada
-                    </button>
-                </div>
-            )}
         </div>
     );
 };

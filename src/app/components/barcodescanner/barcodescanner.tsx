@@ -1,7 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import Quagga from 'quagga';
 
-
 interface BarcodeScannerProps {
     onScan: (code: string) => void;
 }
@@ -9,7 +8,8 @@ interface BarcodeScannerProps {
 const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const [isScanning, setIsScanning] = useState<boolean>(false);
-    const [lastScanTime, setLastScanTime] = useState<number>(0);
+    const [quaggaReady, setQuaggaReady] = useState<boolean>(false);
+    const [scanCooldown, setScanCooldown] = useState<boolean>(false);
 
     useEffect(() => {
         const startScanner = async () => {
@@ -31,7 +31,16 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan }) => {
                             console.error('Error al inicializar Quagga:', err);
                             return;
                         }
-                        Quagga.start();
+                        setQuaggaReady(true);
+                        Quagga.onDetected((data: QuaggaJSResultObject) => {
+                            if (data && data.codeResult && data.codeResult.code && !scanCooldown) {
+                                onScan(data.codeResult.code);
+                                setScanCooldown(true);
+                                setTimeout(() => {
+                                    setScanCooldown(false);
+                                }, 1000); // 1000 milliseconds (1 second) cooldown
+                            }
+                        });
                     });
                 }
             } catch (err) {
@@ -40,8 +49,6 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan }) => {
         };
 
         startScanner();
-
-        Quagga.onDetected(handleScan);
 
         return () => {
             try {
@@ -55,15 +62,19 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan }) => {
         };
     }, []);
 
-    const handleScan = (data: QuaggaJSResultObject) => {
-        if (data && data.codeResult && data.codeResult.code) {
-            const currentTime = Date.now();
-            if (currentTime - lastScanTime > 1000) {
-                onScan(data.codeResult.code);
-                setLastScanTime(currentTime);
-            }
+    useEffect(() => {
+        if (quaggaReady) {
+            Quagga.onDetected((data: QuaggaJSResultObject) => {
+                if (data && data.codeResult && data.codeResult.code && !scanCooldown) {
+                    onScan(data.codeResult.code);
+                    setScanCooldown(true);
+                    setTimeout(() => {
+                        setScanCooldown(false);
+                    }, 1000); // 1000 milliseconds (1 second) cooldown
+                }
+            });
         }
-    };
+    }, [onScan, quaggaReady, scanCooldown]);
 
     const handleScanToggle = () => {
         if (Quagga) {

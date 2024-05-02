@@ -10,6 +10,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan }) => {
     const [isScanning, setIsScanning] = useState<boolean>(false);
     const [quaggaReady, setQuaggaReady] = useState<boolean>(false);
     const [scanCooldown, setScanCooldown] = useState<boolean>(false);
+    const [scannedCodes, setScannedCodes] = useState<Set<string>>(new Set());
 
     useEffect(() => {
         const startScanner = async () => {
@@ -65,16 +66,16 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan }) => {
     useEffect(() => {
         if (quaggaReady) {
             Quagga.onDetected((data: QuaggaJSResultObject) => {
-                if (data && data.codeResult && data.codeResult.code && !scanCooldown) {
-                    onScan(data.codeResult.code);
-                    setScanCooldown(true);
-                    setTimeout(() => {
-                        setScanCooldown(false);
-                    }, 1000); // 1000 milliseconds (1 second) cooldown
+                if (data && data.codeResult && data.codeResult.code) {
+                    const scannedCode = data.codeResult.code;
+                    if (!scannedCodes.has(scannedCode)) {
+                        onScan(scannedCode);
+                        setScannedCodes(prevCodes => new Set(prevCodes.add(scannedCode)));
+                    }
                 }
             });
         }
-    }, [onScan, quaggaReady, scanCooldown]);
+    }, [onScan, quaggaReady, scannedCodes]);
 
     const handleScanToggle = () => {
         if (Quagga) {

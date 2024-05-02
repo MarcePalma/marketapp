@@ -9,7 +9,7 @@ const Sales: React.FC = () => {
     const [scannedCode, setScannedCode] = useState<string | null>(null);
     const [stockData, setStockData] = useState<Product[]>([]);
     const [filteredStockData, setFilteredStockData] = useState<Product[]>([]);
-    const [scannedProducts, setScannedProducts] = useState<Product[]>([]);
+    const [scannedProducts, setScannedProducts] = useState<Set<Product>>(new Set());
     const [isSaleCompleted, setIsSaleCompleted] = useState<boolean>(false);
 
     useEffect(() => {
@@ -35,17 +35,14 @@ const Sales: React.FC = () => {
     // Función para manejar el escaneo de códigos de barras
     const handleScan = (code: string) => {
         setScannedCode(code);
-        const scannedProduct = filteredStockData.find(product => product.codebar === parseInt(code));
-        if (scannedProduct) {
-            setScannedProducts(prevProducts => [...prevProducts, scannedProduct]);
+        const scannedProduct = filteredStockData.find(product => product.codebar.toString() === code);
+        if (scannedProduct && !scannedProducts.has(scannedProduct)) {
+            setScannedProducts(prevProducts => new Set(prevProducts.add(scannedProduct)));
         }
     };
-
-
-
-
+    
     // Calcular el precio total
-    const totalPrice = scannedProducts.reduce((total, product) => {
+    const totalPrice = Array.from(scannedProducts).reduce((total, product) => {
         return total + (product.price * product.quantity);
     }, 0);
 
@@ -100,7 +97,7 @@ const Sales: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {scannedProducts.map((product, index) => (
+                            {Array.from(scannedProducts).map((product, index) => (
                                 <tr key={index} className="border-b border-gray-200">
                                     <td className="py-2">{product.id}</td>
                                     <td className="py-2">{product.name}</td>

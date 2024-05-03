@@ -21,3 +21,10 @@ model Product {
   discount  String
   codebar String
 }
+model Sale {
+  id        Int      @id @default(autoincrement())
+  productName  String
+  price     Float
+  quantity  Int
+  saleDate  DateTime  @default(now())
+}

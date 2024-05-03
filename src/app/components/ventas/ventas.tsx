@@ -175,7 +175,7 @@ const Sales: React.FC = () => {
                     }
 
                     .animate-moveUp {
-                        animation: moveUp 1s ease forwards;
+                        animation: moveUp 2s ease forwards;
                     }
                 `}
                         </style>

@@ -67,22 +67,26 @@ const Sales: React.FC = () => {
 
 
     const handleSaleCompleted = () => {
-        // Simular una venta completada
         setIsCompletingSale(true);
-        setSoldAmount(1000); // Por ejemplo, se vendió $1000
-
-        // Lógica para subir el monto vendido a la base de datos
+        setSoldAmount(totalPrice); // Por ejemplo, se vendió $1000
 
         // Después de 1 segundo, restablecer el estado
         setTimeout(() => {
             setIsCompletingSale(false);
             setSoldAmount(0);
+            setIsSaleCompleted(true);
+            setScannedProducts(new Set()); // Limpiar productos escaneados
         }, 1000);
-        setIsSaleCompleted(true);
     };
 
     const handleFilterChange = (filteredData: Product[]) => {
         setFilteredStockData(filteredData);
+    };
+
+    const handleRemoveProduct = (productToRemove: Product) => {
+        const updatedScannedProducts = new Set(scannedProducts);
+        updatedScannedProducts.delete(productToRemove); // Elimina el producto de la lista
+        setScannedProducts(updatedScannedProducts);
     };
 
     return (
@@ -125,6 +129,7 @@ const Sales: React.FC = () => {
                                 <th className="p-2 text-left">Nombre</th>
                                 <th className="p-2 text-left">Cantidad</th>
                                 <th className="p-2 text-left">Precio</th>
+                                <th className="p-2 text-left">Acciones</th> {/* Nuevo encabezado para el botón de eliminar */}
                             </tr>
                         </thead>
                         <tbody>
@@ -142,6 +147,9 @@ const Sales: React.FC = () => {
                                         </button>
                                     </td>
                                     <td className="py-2">${product.price}</td>
+                                    <td className="py-2">
+                                        <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-full" onClick={() => handleRemoveProduct(product)}>Eliminar</button> {/* Botón para eliminar el producto */}
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
@@ -150,43 +158,42 @@ const Sales: React.FC = () => {
                     <div className="mt-4">
                         <h2 className="text-lg font-semibold">Total</h2>
                         <p className="text-xl font-bold">${totalPrice.toFixed(2)}</p>
-                        {!isSaleCompleted && scannedCode && (
-                            <div className="flex justify-right mt-4 relative">
-                                <button className="bg-green-500 text-white px-4 py-2 rounded-md" onClick={handleSaleCompleted}>
-                                    Venta Completada
-                                </button>
-                                {isCompletingSale && (
-                                    <div className="absolute bottom-0 right-0 bg-green-500 text-white px-2 py-1 rounded-md animate-moveUp">
-                                        Completando venta...
-                                    </div>
-                                )}
-                                {soldAmount > 0 && (
-                                    <div className="absolute bottom-0 right-0 bg-green-500 text-white px-2 py-1 rounded-md animate-moveUp">
-                                        +${soldAmount}
-                                    </div>
-                                )}
+                        <button className="bg-green-500 text-white px-4 py-2 rounded-md" onClick={handleSaleCompleted}>
+                            Venta Completada
+                        </button>
+                        <style>
+                            {`
+                    @keyframes moveUp {
+                        0% {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                        100% {
+                            opacity: 0;
+                            transform: translateY(-50px);
+                        }
+                    }
+
+                    .animate-moveUp {
+                        animation: moveUp 1s ease forwards;
+                    }
+                `}
+                        </style>
+
+                        {/* Animación para mostrar el estado de venta */}
+                        {isCompletingSale && (
+                            <div className="bg-green-500 text-white px-2 py-1 rounded-md absolute bottom-100 left-1/2 transform -translate-x-1/2">
+                                Completando venta...
+                            </div>
+                        )}
+                        {soldAmount > 0 && (
+                            <div className="bg-green-500 text-white px-2 py-1 rounded-md animate-moveUp absolute bottom-100 left-1/2 transform -translate-x-1/2">
+                                +${soldAmount}
                             </div>
                         )}
                     </div>
                 </div>
             </div>
-            <style>
-                {`
-               @keyframes moveUp {
-                0% {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-                100% {
-                    opacity: 0;
-                    transform: translateY(-50px);
-                }
-            }
-            
-            .animate-moveUp {
-                animation: moveUp 1s ease forwards;
-            }`}
-            </style>
         </div>
     );
 };

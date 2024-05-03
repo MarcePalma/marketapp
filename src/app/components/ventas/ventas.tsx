@@ -59,16 +59,38 @@ const Sales: React.FC = () => {
     //Funcion para manejar la cantidad de productos escaneados
     const handleChangeQuantity = (product: Product, newQuantity: number) => {
         const updatedScannedProducts = new Set(scannedProducts);
-        updatedScannedProducts.delete(product); // Elimina el producto actual
-        const updatedProduct = { ...product, quantity: newQuantity }; // Actualiza la cantidad del producto
-        updatedScannedProducts.add(updatedProduct); // Agrega el producto actualizado
+        updatedScannedProducts.delete(product);
+        const updatedProduct = { ...product, quantity: newQuantity };
+        updatedScannedProducts.add(updatedProduct); 
         setScannedProducts(updatedScannedProducts);
     };
 
 
-    const handleSaleCompleted = () => {
+    const handleSaleCompleted = async () => {
         setIsCompletingSale(true);
-        setSoldAmount(totalPrice); // Por ejemplo, se vendió $1000
+        setSoldAmount(totalPrice);
+
+        try {
+            const response = await fetch('/api/ventas/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    productName: Array.from(scannedProducts).map(product => product.name).join(', '), // Convertimos scannedProducts en un array
+                    price: totalPrice,
+                    quantity: Array.from(scannedProducts).reduce((total, product) => total + product.quantity, 0) // Sumamos las cantidades de todos los productos vendidos
+                })
+            });
+
+            if (response.ok) {
+                console.log('Venta registrada con éxito');
+            } else {
+                throw new Error('Error al registrar la venta');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
 
         // Después de 1 segundo, restablecer el estado
         setTimeout(() => {

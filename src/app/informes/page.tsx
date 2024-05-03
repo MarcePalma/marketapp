@@ -1,9 +1,12 @@
+
 import React from 'react'
+import Informes from '../components/informes/informes'
 
 export default function Index() {
     return (
         <main>
-            <p>Hola!</p>
+            <p>Ventas del dia!</p>
+            <Informes/>
         </main>
     )
 }

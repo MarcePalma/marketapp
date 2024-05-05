@@ -1,7 +1,10 @@
 import React from 'react';
-import Link from 'next/link';
 
-export default function SidebarMenu() {
+interface SidebarMenuProps {
+    onMenuItemClick: (componentName: string) => void;
+}
+
+const SidebarMenu: React.FC<SidebarMenuProps> = ({ onMenuItemClick }) => {
     const handleCloseMenu = (e: React.MouseEvent<HTMLDetailsElement, MouseEvent>) => {
         const parentDetails = e.currentTarget.parentElement;
         if (parentDetails) {
@@ -17,15 +20,16 @@ export default function SidebarMenu() {
                         <a
                             href="#"
                             className="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                            onClick={() => onMenuItemClick('IngresosDiarios')}
                         >
                             Ingresos Diarios
                         </a>
                     </li>
-
                     <li>
                         <a
                             href="#"
                             className="block rounded-lg px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                            onClick={() => onMenuItemClick('IngresosSemanales')}
                         >
                             Ingresos Semanales
                         </a>
@@ -52,11 +56,11 @@ export default function SidebarMenu() {
                 {
                     `
                     .sidebar-menu {
-                        max-width: 500px; /* Definir un ancho máximo para el menú */
+                        max-width: 500px;
                       }
                       
                       .sidebar-menu summary::-webkit-details-marker {
-                        display: none; /* Ocultar el indicador de detalles */
+                        display: none;
                       }
                       `
 
@@ -64,4 +68,6 @@ export default function SidebarMenu() {
             </style>
         </div>
     );
-}
+};
+
+export default SidebarMenu;

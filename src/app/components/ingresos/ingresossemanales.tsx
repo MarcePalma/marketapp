@@ -1,31 +1,26 @@
-'use client'
-import React, { useEffect, useState } from "react";
-import SearchBar from "../searchbar/searchbar";
+import React, { useEffect, useState } from 'react';
+import SearchBar from '../searchbar/searchbar';
 
-const IngresosDiarios: React.FC = () => {
-    const [ventasDiarias, setVentasDiarias] = useState<any[]>([]);
+const IngresosSemanales: React.FC = () => {
+    const [ventasSemanales, setVentasSemanales] = useState<any[]>([]);
     const [filteredIngresos, setFilteredIngresos] = useState<any[]>([]);
-    const [searchTerm, setSearchTerm] = useState("");
+    const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const fetchVentasDiarias = async () => {
+        const fetchVentasSemanales = async () => {
             try {
-                const today = new Date();
-                const formattedDate = today.toISOString().split('T')[0];
-                const response = await fetch(`/api/ventas?fecha=${formattedDate}`);
+                const response = await fetch(`/api/ventas/semanales`);
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('Datos de ventas diarias recibidos:', data);
-                    if (Array.isArray(data)) {
-                        setVentasDiarias(data);
-                    } else if (data && Array.isArray(data.ventas)) {
-                        setVentasDiarias(data.ventas);
+                    console.log('Datos de ventas semanales recibidos:', data);
+                    if (Array.isArray(data.sales)) {
+                        setVentasSemanales(data.sales);
                     } else {
-                        throw new Error('Los datos recibidos no son válidos');
+                        throw new Error('Los datos recibidos no son un array');
                     }
                 } else {
-                    throw new Error('Error al obtener las ventas diarias');
+                    throw new Error('Error al obtener las ventas semanales');
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -33,17 +28,17 @@ const IngresosDiarios: React.FC = () => {
                 setIsLoading(false);
             }
         };
-
-        fetchVentasDiarias();
+    
+        fetchVentasSemanales();
     }, []);
 
 
     useEffect(() => {
-        const filteredResults = ventasDiarias.filter(venta =>
+        const filteredResults = ventasSemanales.filter(venta =>
             venta.productName.toLowerCase().includes(searchTerm.toLowerCase())
         );
         setFilteredIngresos(filteredResults);
-    }, [searchTerm, ventasDiarias]);
+    }, [searchTerm, ventasSemanales]);
 
     const handleSearchChange = () => {
         // Esta función no hace nada en este momento
@@ -51,8 +46,8 @@ const IngresosDiarios: React.FC = () => {
 
     return (
         <div>
-            <h2>Ingresos Diarios</h2>
-            <SearchBar stockData={ventasDiarias} filteredStockData={filteredIngresos} onFilterChange={handleSearchChange} />
+            <h2>Ingresos Semanales</h2>
+            <SearchBar stockData={ventasSemanales} filteredStockData={filteredIngresos} onFilterChange={handleSearchChange} />
             {isLoading ? (
                 <p>Cargando...</p>
             ) : (
@@ -89,4 +84,4 @@ const IngresosDiarios: React.FC = () => {
     );
 };
 
-export default IngresosDiarios;
+export default IngresosSemanales;

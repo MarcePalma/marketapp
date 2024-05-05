@@ -111,23 +111,25 @@ const Stock: React.FC = () => {
     };
 
     //Funcion para Eliminar productos de la DB
-    const handleDeleteProduct = async (id: number) => {
-        try {
-            console.log('Eliminando producto...');
-            const response = await fetch(`/api/stock/delete/${id}`, {
-                method: 'DELETE'
-            });
-            if (response.ok) {
-                setStockData(prevStockData => prevStockData.filter(product => product.id !== id));
-                console.log('Producto eliminado correctamente.');
-            } else {
-                throw new Error('Error al eliminar el producto');
-            }
-        } catch (error) {
-            console.error('Error al eliminar el producto:', error);
-        }
+    const deleteProduct = (product: Product) => {
+        const productId = product.id; // Extraer el ID del objeto de producto
+        fetch(`/api/stock/delete`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id: productId }), // Enviar solo el ID del producto en la solicitud DELETE
+        })
+            .then(response => {
+                if (response.ok) {
+                    setStockData(prevStockData => prevStockData.filter(p => p.id !== productId));
+                    console.log('Producto eliminado correctamente.');
+                } else {
+                    throw new Error('Error al eliminar el producto');
+                }
+            })
+            .catch(error => console.error('Error al eliminar el producto:', error));
     };
-
     // Función para guardar los cambios realizados en el stock
     const handleSaveChanges = async () => {
         try {
@@ -224,7 +226,7 @@ const Stock: React.FC = () => {
                                         <td className="py-2">{product.codebar}</td>
                                         <td>
                                             <button
-                                                onClick={() => handleDeleteProduct(product.id)}
+                                                onClick={() => deleteProduct(product)}
                                                 className="inline-flex items-center gap-2 rounded-md bg-white px-4 py-2 text-sm text-red-500 shadow-sm focus:relative hover:bg-red-500 hover:text-white transition duration-300"
                                             >
                                                 <svg

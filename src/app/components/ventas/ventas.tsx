@@ -69,11 +69,11 @@ const Sales: React.FC = () => {
     const handleSaleCompleted = async () => {
         setIsCompletingSale(true);
         setSoldAmount(totalPrice);
-    
+
         try {
             const currentDate = new Date();
             const formattedDate = currentDate.toISOString();
-    
+
             const response = await fetch('/api/ventas/create', {
                 method: 'POST',
                 headers: {
@@ -86,7 +86,7 @@ const Sales: React.FC = () => {
                     saleDate: formattedDate
                 })
             });
-    
+
             if (response.ok) {
                 console.log('Venta registrada con éxito');
             } else {
@@ -95,16 +95,25 @@ const Sales: React.FC = () => {
         } catch (error) {
             console.error('Error:', error);
         }
-    
+
+        // Limpiar los productos vendidos
+        const updatedScannedProducts = new Set(scannedProducts);
+        Array.from(scannedProducts).forEach((product) => {
+            if (product.quantity === 0) {
+                updatedScannedProducts.delete(product);
+            }
+        });
+        setScannedProducts(updatedScannedProducts);
+
         // Después de 1 segundo, restablecer el estado
         setTimeout(() => {
             setIsCompletingSale(false);
             setSoldAmount(0);
             setIsSaleCompleted(true);
-            setScannedProducts(new Set()); // Limpiar productos escaneados
+            setScannedProducts(new Set());
             setScannedCode("");
         }, 1000);
-    }
+    };
     const handleFilterChange = (filteredData: Product[]) => {
         setFilteredStockData(filteredData);
     };

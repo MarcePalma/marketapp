@@ -14,17 +14,24 @@ datasource db {
 }
 
 model Product {
-  id        Int      @id @default(autoincrement())
-  name      String
-  quantity  Int
-  price     Float
-  discount  String
-  codebar String
+  id       Int    @id @default(autoincrement())
+  name     String
+  quantity Int
+  price    Float
+  discount String
+  codebar  String
 }
+
 model Sale {
-  id        Int      @id @default(autoincrement())
-  productName  String
-  price     Float
-  quantity  Int
-  saleDate  DateTime  @default(now())
+  id          Int      @id @default(autoincrement())
+  productName String
+  price       Float
+  quantity    Int
+  saleDate    DateTime @default(now())
+}
+
+model Gasto {
+  id       Int      @id @default(autoincrement())
+  concepto Int
+  fecha    DateTime @default(now())
 }

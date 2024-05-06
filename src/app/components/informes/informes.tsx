@@ -7,6 +7,7 @@ import SidebarMenu from "./menu";
 import IngresosDiarios from "../ingresos/ingresosdiarios";
 import IngresosSemanales from "../ingresos/ingresossemanales";
 import IngresosMensuales from "../ingresos/ingresosmensuales";
+import GastosMensuales from "../gastos/gastos";
 
 const Informes: React.FC = () => {
     const [selectedComponent, setSelectedComponent] = useState('IngresosDiarios');
@@ -33,13 +34,10 @@ const Informes: React.FC = () => {
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5 }}
                     >
-                        {selectedComponent === 'IngresosDiarios' && <div>
-                            <IngresosDiarios/>
-                        </div> }
+                        {selectedComponent === 'IngresosDiarios' && <IngresosDiarios/> }
                         {selectedComponent === 'IngresosSemanales' && <IngresosSemanales />}
-                        {selectedComponent === 'IngresosMensuales' && <div>
-                            <IngresosMensuales />
-                        </div>}
+                        {selectedComponent === 'IngresosMensuales' && <IngresosMensuales />}
+                        {selectedComponent === 'Gastos' && <GastosMensuales/>}
                     </motion.div>
                 </motion.div>
             </div>

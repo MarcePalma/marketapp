@@ -67,6 +67,7 @@ const IngresosSemanales: React.FC = () => {
     return (
         <div>
             <h2>Ingresos Semanales</h2>
+            <h2>Semana del {obtenerFechaStringPrimerDiaSemana()} al {obtenerFechaStringUltimoDiaSemana()}</h2>
             <SearchBar stockData={ventasSemanales} filteredStockData={filteredIngresos} onFilterChange={handleSearchChange} />
             <table className="w-full">
                 <thead>

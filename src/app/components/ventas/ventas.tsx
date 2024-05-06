@@ -61,7 +61,7 @@ const Sales: React.FC = () => {
         const updatedScannedProducts = new Set(scannedProducts);
         updatedScannedProducts.delete(product);
         const updatedProduct = { ...product, quantity: newQuantity };
-        updatedScannedProducts.add(updatedProduct); 
+        updatedScannedProducts.add(updatedProduct);
         setScannedProducts(updatedScannedProducts);
     };
 
@@ -69,20 +69,24 @@ const Sales: React.FC = () => {
     const handleSaleCompleted = async () => {
         setIsCompletingSale(true);
         setSoldAmount(totalPrice);
-
+    
         try {
+            const currentDate = new Date();
+            const formattedDate = currentDate.toISOString();
+    
             const response = await fetch('/api/ventas/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    productName: Array.from(scannedProducts).map(product => product.name).join(', '), // Convertimos scannedProducts en un array
+                    productName: Array.from(scannedProducts).map(product => product.name).join(', '), // Convertir scannedProducts en un array de nombres de productos
                     price: totalPrice,
-                    quantity: Array.from(scannedProducts).reduce((total, product) => total + product.quantity, 0) // Sumamos las cantidades de todos los productos vendidos
+                    quantity: Array.from(scannedProducts).reduce((total, product) => total + product.quantity, 0), // Sumar las cantidades de todos los productos vendidos
+                    saleDate: formattedDate
                 })
             });
-
+    
             if (response.ok) {
                 console.log('Venta registrada con éxito');
             } else {
@@ -91,16 +95,16 @@ const Sales: React.FC = () => {
         } catch (error) {
             console.error('Error:', error);
         }
-
+    
         // Después de 1 segundo, restablecer el estado
         setTimeout(() => {
             setIsCompletingSale(false);
             setSoldAmount(0);
             setIsSaleCompleted(true);
             setScannedProducts(new Set()); // Limpiar productos escaneados
+            setScannedCode("");
         }, 1000);
-    };
-
+    }
     const handleFilterChange = (filteredData: Product[]) => {
         setFilteredStockData(filteredData);
     };

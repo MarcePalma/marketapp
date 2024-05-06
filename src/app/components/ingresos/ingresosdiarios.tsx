@@ -7,28 +7,22 @@ const IngresosDiarios: React.FC = () => {
     const [filteredIngresos, setFilteredIngresos] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchVentasDiarias = async () => {
             try {
-                const today = new Date();
-                const formattedDate = today.toISOString().split('T')[0];
-                const response = await fetch(`/api/ventas?fecha=${formattedDate}`);
+                const response = await fetch(`/api/ventas`);
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Datos de ventas diarias recibidos:', data);
-                    if (Array.isArray(data)) {
-                        setVentasDiarias(data);
-                    } else if (data && Array.isArray(data.ventas)) {
-                        setVentasDiarias(data.ventas);
-                    } else {
-                        throw new Error('Los datos recibidos no son válidos');
-                    }
+                    setVentasDiarias(data.sales || []);
                 } else {
                     throw new Error('Error al obtener las ventas diarias');
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error al obtener ventas diarias:', error);
+                setError('Error al obtener las ventas diarias. Por favor, inténtelo de nuevo más tarde.');
             } finally {
                 setIsLoading(false);
             }
@@ -37,54 +31,65 @@ const IngresosDiarios: React.FC = () => {
         fetchVentasDiarias();
     }, []);
 
-
     useEffect(() => {
-        const filteredResults = ventasDiarias.filter(venta =>
-            venta.productName.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        setFilteredIngresos(filteredResults);
-    }, [searchTerm, ventasDiarias]);
+        if (ventasDiarias.length > 0) {
+            const today = new Date().toISOString().split('T')[0];
+            const ventasHoy = ventasDiarias.filter(venta => venta.saleDate.split('T')[0] === today);
+            setFilteredIngresos(ventasHoy);
+        }
+    }, [ventasDiarias]);
 
-    const handleSearchChange = () => {
-        // Esta función no hace nada en este momento
+    const formatFecha = (fecha: string) => {
+        const date = new Date(fecha);
+        return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`;
     };
+
+    const totalPrecio = filteredIngresos.reduce((total, venta) => total + venta.price * venta.quantity, 0);
+
+    // Esta función no hace nada por ahora
+    const handleSearchChange = () => {
+        // No hace nada por ahora
+    };
+
+    if (isLoading) {
+        return <p>Cargando...</p>;
+    }
+
+    if (error) {
+        return <p>{error}</p>;
+    }
 
     return (
         <div>
             <h2>Ingresos Diarios</h2>
             <SearchBar stockData={ventasDiarias} filteredStockData={filteredIngresos} onFilterChange={handleSearchChange} />
-            {isLoading ? (
-                <p>Cargando...</p>
-            ) : (
-                <table className="w-full">
-                    <thead>
-                        <tr className="bg-gray-200">
-                            <th className="p-3 text-left">ID</th>
-                            <th className="p-3 text-left">Nombre</th>
-                            <th className="p-3 text-left">Precio</th>
-                            <th className="p-3 text-left">Cantidad</th>
-                            <th className="p-3 text-left">Fecha de Venta</th>
+            <table className="w-full">
+                <thead>
+                    <tr className="bg-gray-200">
+                        <th className="p-3 text-left">Nombre</th>
+                        <th className="p-3 text-left">Precio</th>
+                        <th className="p-3 text-left">Cantidad</th>
+                        <th className="p-3 text-left">Fecha de Venta</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {filteredIngresos.length === 0 ? (
+                        <tr>
+                            <td colSpan={5}>Nada que mostrar por ahora</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {filteredIngresos.length === 0 ? (
-                            <tr>
-                                <td colSpan={5}>Nada que mostrar por ahora</td>
+                    ) : (
+                        filteredIngresos.map((venta, index) => (
+                            <tr key={index}>
+                                <td className="p-3">{venta.productName}</td>
+                                <td className="p-3 font-semibold">${venta.price}</td>
+                                <td className="p-3">{venta.quantity}</td>
+                                <td className="p-3">{formatFecha(venta.saleDate)}</td>
                             </tr>
-                        ) : (
-                            filteredIngresos.map((venta, index) => (
-                                <tr key={index}>
-                                    <td className="p-3">{venta.id}</td>
-                                    <td className="p-3">{venta.productName}</td>
-                                    <td className="p-3 font-semibold">${venta.price}</td>
-                                    <td className="p-3">{venta.quantity}</td>
-                                    <td className="p-3">{venta.saleDate}</td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
-            )}
+                        ))
+                    )}
+                </tbody>
+            </table>
+            <p className="mt-4">Total: ${totalPrecio}</p>
         </div>
     );
 };

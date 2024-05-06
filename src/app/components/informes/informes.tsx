@@ -5,6 +5,7 @@ import Navbar from "../navbar/Navbar";
 import SidebarMenu from "./menu";
 import IngresosDiarios from "../ingresos/ingresosdiarios";
 import IngresosSemanales from "../ingresos/ingresossemanales";
+import VentasComponent from "../ingresos/test";
 
 const Informes: React.FC = () => {
     const [selectedComponent, setSelectedComponent] = useState('IngresosDiarios'); // Por defecto muestra IngresosDiarios

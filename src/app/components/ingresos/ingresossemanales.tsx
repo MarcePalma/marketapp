@@ -49,7 +49,7 @@ const IngresosSemanales: React.FC = () => {
         return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`;
     };
 
-    const totalPrecio = filteredIngresos.reduce((total, venta) => total + venta.price * venta.quantity, 0);
+    const totalPrecio = filteredIngresos.reduce((total, venta) => total + venta.price, 0);
 
     // Esta función no hace nada por ahora
     const handleSearchChange = () => {
@@ -95,7 +95,7 @@ const IngresosSemanales: React.FC = () => {
                     )}
                 </tbody>
             </table>
-            <p className="mt-4">Total: ${totalPrecio}</p>
+            <p className="mt-4 font-bold text-xl">Total: <span className="text-green-600">${totalPrecio}</span></p>
         </div>
     );
 };
